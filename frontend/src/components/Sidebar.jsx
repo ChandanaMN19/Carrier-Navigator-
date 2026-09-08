@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Hammer, Bot, Mic, Brain, Sparkles, LogOut, User, Target, ChevronRight, Award } from 'lucide-react';
+import { FileText, Hammer, Bot, Mic, Brain, Sparkles, LogOut, User, Target, ChevronRight, Award, ShieldCheck } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, user, onSignOut }) {
   const navItems = [
@@ -19,7 +19,7 @@ export default function Sidebar({ activeTab, setActiveTab, user, onSignOut }) {
         </div>
         <div className="brand-text">
           <span className="brand-title">Career Navigator</span>
-          <span className="brand-subtitle">AI Studio & Studio Hub</span>
+          <span className="brand-subtitle">AI Studio & Career Hub</span>
         </div>
       </div>
 
@@ -27,8 +27,8 @@ export default function Sidebar({ activeTab, setActiveTab, user, onSignOut }) {
       {user && (
         <div className="sidebar-user-card">
           <div className="user-avatar-wrapper">
-            <div className="avatar-circle">
-              <User size={18} />
+            <div className="avatar-circle" style={{ background: user.provider ? 'linear-gradient(135deg, #4285F4, #ec4899)' : 'var(--sunset-gradient)' }}>
+              {user.avatar || (user.name ? user.name.charAt(0).toUpperCase() : 'U')}
             </div>
             <span className="online-indicator" />
           </div>
@@ -37,6 +37,12 @@ export default function Sidebar({ activeTab, setActiveTab, user, onSignOut }) {
             <div className="user-role-badge">
               <span>{user.role || 'Student'}</span>
             </div>
+            {user.provider && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', color: '#34d399', fontWeight: 700, marginTop: '2px' }}>
+                <ShieldCheck size={12} />
+                <span>{user.provider} Auth</span>
+              </div>
+            )}
             {user.targetRole && (
               <div className="user-target-role">
                 <Target size={12} className="text-pink-400" />
@@ -88,7 +94,7 @@ export default function Sidebar({ activeTab, setActiveTab, user, onSignOut }) {
 
         <button onClick={onSignOut} className="sidebar-signout-btn">
           <LogOut size={16} />
-          <span>Sign Out to Portal</span>
+          <span>Sign Out / Switch Profile</span>
         </button>
       </div>
     </aside>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Sparkles, Globe, HelpCircle, User, Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, GraduationCap, Briefcase, Rocket, UserCheck, ShieldAlert, Check } from 'lucide-react';
+import { Sparkles, Globe, HelpCircle, User, Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, GraduationCap, Briefcase, Rocket, UserCheck, ShieldAlert } from 'lucide-react';
+import OAuthModal from './OAuthModal';
 
 export default function LandingPage({ onLoginSuccess }) {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -11,6 +12,7 @@ export default function LandingPage({ onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [activeOAuthProvider, setActiveOAuthProvider] = useState(null); // "Google" or "GitHub"
 
   const demoEmail = 'alex.vance@stanford.edu';
 
@@ -61,6 +63,7 @@ export default function LandingPage({ onLoginSuccess }) {
         role: userRole,
         targetRole: targetRole || 'Software Engineer',
         institution: userRole === 'Student' ? 'Stanford University' : 'Career Professional',
+        provider: 'Email & Password (Encrypted)',
         isNewUser: true
       });
     } else {
@@ -70,6 +73,7 @@ export default function LandingPage({ onLoginSuccess }) {
         role: 'Student / Candidate',
         targetRole: 'Software Engineer',
         institution: 'Stanford University',
+        provider: 'Email & Password (Encrypted)',
         isNewUser: false
       });
     }
@@ -77,6 +81,18 @@ export default function LandingPage({ onLoginSuccess }) {
 
   return (
     <div className="sunset-portal-container">
+      {/* OAuth 2.0 Authorization Modal */}
+      {activeOAuthProvider && (
+        <OAuthModal
+          provider={activeOAuthProvider}
+          onClose={() => setActiveOAuthProvider(null)}
+          onAuthSuccess={(authData) => {
+            setActiveOAuthProvider(null);
+            onLoginSuccess(authData);
+          }}
+        />
+      )}
+
       {/* Top Portal Header */}
       <header className="portal-header">
         <div className="portal-brand">
@@ -125,8 +141,8 @@ export default function LandingPage({ onLoginSuccess }) {
           </h2>
           <p className="card-subtitle">
             {isRegisterMode
-              ? 'Create a secure student or candidate profile to start practicing mock interviews, building ATS resumes, and taking aptitude tests.'
-              : 'Sign in to access your resume studio, AI mock interview reps, and tailored career pathways.'}
+              ? 'Create a secure student or candidate profile using Google, GitHub, or Email to start practicing mock interviews & building ATS resumes.'
+              : 'Sign in with your Google, GitHub, or academic account to access your studio.'}
           </p>
 
           {errorMessage && (
@@ -141,7 +157,7 @@ export default function LandingPage({ onLoginSuccess }) {
             <button
               type="button"
               className="oauth-btn"
-              onClick={() => onLoginSuccess({ name: isRegisterMode ? 'Student Candidate' : 'Alex Vance', email: demoEmail, role: 'Student', targetRole: 'Software Engineer', institution: 'Stanford University' })}
+              onClick={() => setActiveOAuthProvider('Google')}
             >
               <svg className="oauth-icon" viewBox="0 0 24 24" width="18" height="18">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -155,7 +171,7 @@ export default function LandingPage({ onLoginSuccess }) {
             <button
               type="button"
               className="oauth-btn"
-              onClick={() => onLoginSuccess({ name: isRegisterMode ? 'Student Developer' : 'Alex Vance', email: demoEmail, role: 'Student', targetRole: 'Full Stack Engineer', institution: 'Stanford University' })}
+              onClick={() => setActiveOAuthProvider('GitHub')}
             >
               <svg className="oauth-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
