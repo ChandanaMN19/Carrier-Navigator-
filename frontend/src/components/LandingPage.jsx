@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Globe, HelpCircle, User, Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, GraduationCap, Briefcase, Rocket, UserCheck } from 'lucide-react';
+import { Sparkles, Globe, HelpCircle, User, Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, GraduationCap, Briefcase, Rocket, UserCheck, ShieldAlert, Check } from 'lucide-react';
 
 export default function LandingPage({ onLoginSuccess }) {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -10,31 +10,57 @@ export default function LandingPage({ onLoginSuccess }) {
   const [targetRole, setTargetRole] = useState('Software Engineer');
   const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const demoEmail = 'alex.vance@stanford.edu';
 
+  const checkPasswordStrength = (pass) => {
+    if (!pass) return { score: 0, label: '', color: '' };
+    let score = 0;
+    if (pass.length >= 8) score++;
+    if (/[A-Z]/.test(pass)) score++;
+    if (/[a-z]/.test(pass)) score++;
+    if (/[0-9]/.test(pass)) score++;
+    if (/[^A-Za-z0-9]/.test(pass)) score++;
+
+    if (score <= 2) return { score: 30, label: 'Weak (Add numbers & special chars)', color: '#f43f5e' };
+    if (score <= 4) return { score: 70, label: 'Medium (Good password)', color: '#fbbf24' };
+    return { score: 100, label: 'Strong & Secure ✓', color: '#10b981' };
+  };
+
+  const passwordStrength = checkPasswordStrength(password);
+
   const handleAutoFillDemo = () => {
+    setErrorMessage('');
     if (isRegisterMode) {
       setFullName('Alex Vance');
       setUserRole('Student');
       setTargetRole('Software Engineer');
       setEmail('student.alex@stanford.edu');
-      setPassword('••••••••••••');
+      setPassword('Stanford2026!Secured');
     } else {
       setEmail(demoEmail);
-      setPassword('••••••••••••');
+      setPassword('Stanford2026!Secured');
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setErrorMessage('');
+
+    // Password Security Enforcement for Account Creation
+    if (isRegisterMode && passwordStrength.score < 60) {
+      setErrorMessage('Please create a stronger password (at least 8 characters with numbers or special symbols like !@#$) for account safety.');
+      return;
+    }
+
     if (isRegisterMode) {
       onLoginSuccess({
         name: fullName.trim() || `${userRole} Candidate`,
         email: email || 'student@university.edu',
         role: userRole,
         targetRole: targetRole || 'Software Engineer',
-        institution: userRole === 'Student' ? 'University Scholar' : 'Career Professional',
+        institution: userRole === 'Student' ? 'Stanford University' : 'Career Professional',
         isNewUser: true
       });
     } else {
@@ -83,7 +109,7 @@ export default function LandingPage({ onLoginSuccess }) {
         <div className="demo-account-pill" onClick={handleAutoFillDemo}>
           <span className="pill-dot">⚡</span>
           <span>
-            {isRegisterMode ? 'Auto-fill Demo Student Registration' : `Demo Account: ${demoEmail}`}
+            {isRegisterMode ? 'Auto-fill Demo Secure Registration' : `Demo Account: ${demoEmail}`}
           </span>
           <span className="pill-action">Auto-fill →</span>
         </div>
@@ -95,20 +121,27 @@ export default function LandingPage({ onLoginSuccess }) {
           </div>
 
           <h2 className="card-title">
-            {isRegisterMode ? 'Create New Profile' : 'Welcome back'}
+            {isRegisterMode ? 'Create New Account' : 'Welcome back'}
           </h2>
           <p className="card-subtitle">
             {isRegisterMode
-              ? 'Select your career stage and register to personalize your AI resume analyzer, mock interviews, and aptitude tests.'
+              ? 'Create a secure student or candidate profile to start practicing mock interviews, building ATS resumes, and taking aptitude tests.'
               : 'Sign in to access your resume studio, AI mock interview reps, and tailored career pathways.'}
           </p>
+
+          {errorMessage && (
+            <div style={{ width: '100%', background: 'rgba(244, 63, 94, 0.15)', border: '1px solid rgba(244, 63, 94, 0.4)', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.82rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldAlert size={18} style={{ flexShrink: 0 }} />
+              <span>{errorMessage}</span>
+            </div>
+          )}
 
           {/* Social OAuth Buttons */}
           <div className="oauth-button-group">
             <button
               type="button"
               className="oauth-btn"
-              onClick={() => onLoginSuccess({ name: isRegisterMode ? 'Student Learner' : 'Alex Vance', email: demoEmail, role: 'Student', targetRole: 'Software Engineer' })}
+              onClick={() => onLoginSuccess({ name: isRegisterMode ? 'Student Candidate' : 'Alex Vance', email: demoEmail, role: 'Student', targetRole: 'Software Engineer', institution: 'Stanford University' })}
             >
               <svg className="oauth-icon" viewBox="0 0 24 24" width="18" height="18">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -122,7 +155,7 @@ export default function LandingPage({ onLoginSuccess }) {
             <button
               type="button"
               className="oauth-btn"
-              onClick={() => onLoginSuccess({ name: isRegisterMode ? 'Student Developer' : 'Alex Vance', email: demoEmail, role: 'Student', targetRole: 'Full Stack Engineer' })}
+              onClick={() => onLoginSuccess({ name: isRegisterMode ? 'Student Developer' : 'Alex Vance', email: demoEmail, role: 'Student', targetRole: 'Full Stack Engineer', institution: 'Stanford University' })}
             >
               <svg className="oauth-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
@@ -134,7 +167,7 @@ export default function LandingPage({ onLoginSuccess }) {
           <div className="divider-row">
             <div className="divider-line" />
             <span className="divider-text">
-              {isRegisterMode ? 'OR FILL REGISTRATION DETAILS' : 'OR CONTINUE WITH EMAIL'}
+              {isRegisterMode ? 'OR REGISTRATION FORM' : 'OR CONTINUE WITH EMAIL'}
             </span>
             <div className="divider-line" />
           </div>
@@ -254,6 +287,26 @@ export default function LandingPage({ onLoginSuccess }) {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+
+              {/* Password Strength Indicator Meter */}
+              {password && (
+                <div style={{ marginTop: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
+                    <span style={{ color: '#94a3b8' }}>Password Safety</span>
+                    <span style={{ color: passwordStrength.color, fontWeight: 700 }}>{passwordStrength.label}</span>
+                  </div>
+                  <div style={{ height: '5px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        height: '100%',
+                        width: `${passwordStrength.score}%`,
+                        background: passwordStrength.color,
+                        transition: 'all 0.3s ease'
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="checkbox-row">
@@ -271,7 +324,7 @@ export default function LandingPage({ onLoginSuccess }) {
             <button type="submit" className="sunset-primary-btn">
               <span>
                 {isRegisterMode
-                  ? `Create ${userRole} Account & Access Studio`
+                  ? `Create ${userRole} Account & Launch Studio`
                   : 'Sign in to Dashboard'}
               </span>
               <ArrowRight size={18} />
@@ -286,7 +339,10 @@ export default function LandingPage({ onLoginSuccess }) {
             <button
               type="button"
               className="switch-mode-btn"
-              onClick={() => setIsRegisterMode(!isRegisterMode)}
+              onClick={() => {
+                setIsRegisterMode(!isRegisterMode);
+                setErrorMessage('');
+              }}
             >
               {isRegisterMode ? 'Sign in' : 'Create an account'}
             </button>
