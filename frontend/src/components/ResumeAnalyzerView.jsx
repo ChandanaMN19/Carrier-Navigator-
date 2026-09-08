@@ -131,7 +131,7 @@ export default function ResumeAnalyzerView({ onTransferToBuilder }) {
                       key={sec}
                       style={{
                         display: 'flex',
-                        align-items: 'center',
+                        alignItems: 'center',
                         gap: '6px',
                         fontSize: '0.85rem',
                         background: 'rgba(15, 23, 42, 0.6)',
