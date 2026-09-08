@@ -1,0 +1,17 @@
+# Node dependencies
+node_modules/
+frontend/node_modules/
+
+# Maven / Java Build outputs
+target/
+backend/target/
+tools/
+*.jar
+*.war
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
