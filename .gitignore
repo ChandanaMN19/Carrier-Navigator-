@@ -1,6 +1,8 @@
 # Node dependencies
 node_modules/
 frontend/node_modules/
+.npm-cache/
+
 
 # Maven / Java Build outputs
 target/
